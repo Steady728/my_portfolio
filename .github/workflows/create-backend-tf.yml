@@ -1,49 +1,52 @@
-# name: Backend for Terraform
+name: Backend for Terraform
 
-# # Controls when the action will run. Triggers only when merging into the master branch
-# # and pull request from base master branch
+# Controls when the action will run. Triggers only when merging into the master branch
+# and pull request from base master branch
 
-# on:
-#   workflow_dispatch:
+on:
+  workflow_dispatch:
 
-# permissions:
-#   id-token: write
-#   contents: read
-#   pull-requests: read
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: read
 
-# jobs:
-#   setupTFBackend:
-#     runs-on: ubuntu-latest
-#     defaults:
-#       run:
-#         working-directory: ./00-infra-backend
-#     steps:
-#       - name: Git clone the repository
-#         uses: actions/checkout@v4
+jobs:
+  setupTFBackend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./00-infra-backend
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
 
-#       - name: Configure AWS credentials
-#         uses: aws-actions/configure-aws-credentials@v4.0.0
-#         with:
-#           role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
-#           role-session-name: ${{ secrets.ROLE_SESSION_NAME }}
-#           aws-region: ${{ vars.TF_REGION }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.0
+        with:
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.ROLE_SESSION_NAME }}
+          aws-region: ${{ vars.TF_REGION }}
 
-#       - name: Verify Sts GetCallerIdentity
-#         run: aws sts get-caller-identity
+      - name: Verify Sts GetCallerIdentity
+        run: aws sts get-caller-identity
 
-#       - name: Setup Terraform
-#         uses: hashicorp/setup-terraform@v3
-#         with:
-#           terraform_version: ${{ env.TF_VERSION }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
 
-#       - name: Verify terraform version
-#         run: terraform --version
+      - name: Verify terraform version
+        run: terraform --version
 
-#       - name: Terraform init
-#         run: terraform init
+      - name: Terraform init
+        run: terraform init
         
-#       - name: Terraform validate
-#         run: terraform validate
+      - name: Terraform validate
+        run: terraform validate
 
-#       - name: Terraform Apply
-#         run: terraform apply -auto-approve
+      - name: Terraform Plan
+        run: terraform plan
+
+      # - name: Terraform Apply
+      #   run: terraform apply -auto-approve
