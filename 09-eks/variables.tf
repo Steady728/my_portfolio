@@ -1,0 +1,10 @@
+variable "environment" {}
+variable "application" {}
+variable "region" {}
+variable "cluster_name" {}
+variable "cluster_version" {}
+variable "instance_type" {}
+variable "key_name" {}
+variable "volume_size" {}
+variable "volume_type" {}
+variable "ami_release_version" {}

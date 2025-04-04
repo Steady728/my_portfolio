@@ -1,0 +1,11 @@
+variable "service_name" {}
+variable "retention_days" {}
+variable "memory" {}
+variable "cpu" {}
+variable "docker_file_path" {}
+variable "listener_arn" {}
+variable "port" {}
+variable "cluster_info" {}
+variable "network_info" {}
+variable "path_pattern" {}
+variable "desired_count" {}
