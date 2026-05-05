@@ -42,17 +42,13 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Verify terraform version
         run: terraform --version
 
       - name: Terraform init
-        run: |
-          terraform init -backend-config="bucket=${{ vars.S3_BACKEND_CONFIG }}" \
-            -backend-config="key=${{ vars.ENVIRONMENT }}/network.tfstate" \
-            -backend-config="region=${{ vars.TF_REGION }}" \
-            -backend-config="encrypt=true" \
-            -backend-config="use_lockfile=true"
+        run: terraform init
 
       - name: Terraform validate
         run: terraform validate
@@ -84,14 +80,10 @@ jobs:
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: ${{ env.TF_VERSION }}
+          cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
 
       - name: Terraform init
-        run: |
-          terraform init -backend-config="bucket=${{ vars.S3_BACKEND_CONFIG }}" \
-            -backend-config="key=${{ vars.ENVIRONMENT }}/network.tfstate" \
-            -backend-config="region=${{ vars.TF_REGION }}" \
-            -backend-config="encrypt=true" \
-            -backend-config="use_lockfile=true"
+        run: terraform init
 
       - name: Terraform Apply
         if: vars.DESTROY == 'false'

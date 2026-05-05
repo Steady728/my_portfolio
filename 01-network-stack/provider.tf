@@ -1,6 +1,11 @@
 terraform {
 
-  backend "s3" {}
+  cloud {
+    organization = "deji_tech"
+    workspaces {
+      name = "network-stack"
+    }
+  }
 
   required_providers {
     aws = {
