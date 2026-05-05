@@ -1,9 +1,12 @@
 name: Setup Network Stack
 
-# Controls when the action will run. Triggers only when merging into the master branch
-# and pull request from base master branch
-
 on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
   workflow_dispatch:
 
 permissions:
@@ -12,7 +15,8 @@ permissions:
   pull-requests: read
 
 jobs:
-  SetupNetworkStacks:
+  plan:
+    name: Terraform Plan
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -53,10 +57,43 @@ jobs:
       - name: Terraform Plan
         run: terraform plan
 
-      # - name: Terraform Apply
-      #   if: ${{ vars.DESTROY == 'false' }}
-      #   run: terraform apply -auto-approve
+  deploy:
+    name: Terraform Apply / Destroy
+    needs: plan
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: ./01-network-stack
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v4
 
-      # - name: Terraform Destroy
-      #   if: ${{ vars.DESTROY == 'true' }}
-      #   run: terraform destroy -auto-approve
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.0
+        with:
+          role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+          role-session-name: ${{ secrets.ROLE_SESSION_NAME }}
+          aws-region: ${{ vars.TF_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform init
+        run: |
+          terraform init -backend-config="bucket=${{ vars.S3_BACKEND_CONFIG }}" \
+            -backend-config="key=${{ vars.ENVIRONMENT }}/network.tfstate" \
+            -backend-config="region=${{ vars.TF_REGION }}" \
+            -backend-config="encrypt=true" \
+            -backend-config="dynamodb_table=${{ vars.DYNAMODB_TABLE }}"
+
+      - name: Terraform Apply
+        if: vars.DESTROY == 'false'
+        run: terraform apply -auto-approve
+
+      - name: Terraform Destroy
+        if: vars.DESTROY == 'true'
+        run: terraform destroy -auto-approve
