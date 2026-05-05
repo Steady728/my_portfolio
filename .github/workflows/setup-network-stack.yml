@@ -14,6 +14,9 @@ permissions:
   contents: read
   pull-requests: read
 
+env:
+  TF_VERSION: "1.10.5"
+
 jobs:
   plan:
     name: Terraform Plan
@@ -49,7 +52,7 @@ jobs:
             -backend-config="key=${{ vars.ENVIRONMENT }}/network.tfstate" \
             -backend-config="region=${{ vars.TF_REGION }}" \
             -backend-config="encrypt=true" \
-            -backend-config="dynamodb_table=${{ vars.DYNAMODB_TABLE }}"
+            -backend-config="use_lockfile=true"
 
       - name: Terraform validate
         run: terraform validate
@@ -88,7 +91,7 @@ jobs:
             -backend-config="key=${{ vars.ENVIRONMENT }}/network.tfstate" \
             -backend-config="region=${{ vars.TF_REGION }}" \
             -backend-config="encrypt=true" \
-            -backend-config="dynamodb_table=${{ vars.DYNAMODB_TABLE }}"
+            -backend-config="use_lockfile=true"
 
       - name: Terraform Apply
         if: vars.DESTROY == 'false'

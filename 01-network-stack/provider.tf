@@ -1,12 +1,6 @@
 terraform {
 
-  backend "s3" {
-    bucket       = "s3-backend-tfstate-43mpzzi"
-    key          = "dev/network.tfstate"
-    region       = "us-east-1"
-    encrypt      = true
-    use_lockfile = true
-  }
+  backend "s3" {}
 
   required_providers {
     aws = {
@@ -14,7 +8,7 @@ terraform {
       version = "~> 5.60.0"
     }
   }
-  required_version = ">=1.6.0"
+  required_version = ">=1.10.0"
 }
 
 provider "aws" {
