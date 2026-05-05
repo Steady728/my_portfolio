@@ -1,11 +1,10 @@
 terraform {
 
-  backend "s3" {
-    bucket       = "s3-backend-tfstate-43mpzzi"
-    key          = "dev/network.tfstate"
-    region       = "us-east-1"
-    encrypt      = true
-    use_lockfile = true
+  cloud {
+    organization = "deji_tech"
+    workspaces {
+      name = "network-stack"
+    }
   }
 
   required_providers {
@@ -14,7 +13,7 @@ terraform {
       version = "~> 5.60.0"
     }
   }
-  required_version = ">=1.6.0"
+  required_version = ">=1.10.0"
 }
 
 provider "aws" {
